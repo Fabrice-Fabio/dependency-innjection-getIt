@@ -1,5 +1,8 @@
-import 'package:dependency_inject/dep_inj.dart';
+
+import 'package:dependency_inject/injection_container.dart';
 import 'package:flutter/material.dart';
+
+import 'app_service.dart';
 
 void main() {
   setup();
@@ -7,15 +10,10 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
+  const MyApp({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Guys',
-      theme: ThemeData(
-        useMaterial3: true,
-      ),
+    return const MaterialApp(
       home: HomePage(),
       debugShowCheckedModeBanner: false,
     );
@@ -23,74 +21,60 @@ class MyApp extends StatelessWidget {
 }
 
 class HomePage extends StatelessWidget {
-  HomePage({Key? key}) : super(key: key);
+  const HomePage({Key? key}) : super(key: key);
+
+
 
   @override
   Widget build(BuildContext context) {
-
-    void showSnackBar(String value){
-      SnackBar snackBar = SnackBar(
-        content: Text(value),
-        duration: Duration(milliseconds: 500),
-      );
-      ScaffoldMessenger.of(context).showSnackBar(snackBar);
-    }
-
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Flutter Guys', style: TextStyle(color: Colors.white),),
-        backgroundColor: Colors.black,
-        elevation: 1,
+          centerTitle: true,
+          title: const Text(
+            'FLUTTER GUYS',
+            style: TextStyle(fontSize: 14),
+          ),
+          backgroundColor: const Color(0xff1D1E22)
       ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Center(
-            child: Text('Welcome to our DI tutorial'),
-          ),
-          OutlinedButton(
-            style: ButtonStyle(
-              foregroundColor: MaterialStateProperty.all<Color>(Colors.black),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            OutlinedButton(
+              style: ButtonStyle(
+                foregroundColor: MaterialStateProperty.all<Color>(Colors.black),
+              ),
+              onPressed: () {
+                String currentDate = locator<AppService>().execute();
+                showSnackBar(currentDate, context);
+              },
+              child: const Text('Get Date'),
             ),
-            onPressed: () {
-              final currentDate = getIt<AppService>().execute();
-              showSnackBar(currentDate);
-            },
-            child: const Text('Get Date'),
-          ),
-          OutlinedButton(
-            style: ButtonStyle(
-              foregroundColor: MaterialStateProperty.all<Color>(Colors.black),
+            OutlinedButton(
+              style: ButtonStyle(
+                foregroundColor: MaterialStateProperty.all<Color>(Colors.black),
+              ),
+              onPressed: () async {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const DetailsPage()),
+                );
+              },
+              child: const Text('Details page'),
             ),
-            onPressed: () async {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => DetailsPage()),
-              );
-            },
-            child: const Text('Details page'),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 }
 
 class DetailsPage extends StatelessWidget {
-  DetailsPage({Key? key}) : super(key: key);
+  const DetailsPage({Key? key}) : super(key: key);
 
-  final appService = getIt<AppService>();
 
   @override
   Widget build(BuildContext context) {
-
-    void showSnackBar(String value){
-      SnackBar snackBar = SnackBar(
-        content: Text(value),
-        duration: Duration(milliseconds: 500),
-      );
-      ScaffoldMessenger.of(context).showSnackBar(snackBar);
-    }
 
     return Scaffold(
       appBar: AppBar(
@@ -101,7 +85,7 @@ class DetailsPage extends StatelessWidget {
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Center(
+          const Center(
             child: Text('Welcome to our DI tutorial'),
           ),
           OutlinedButton(
@@ -109,8 +93,6 @@ class DetailsPage extends StatelessWidget {
               foregroundColor: MaterialStateProperty.all<Color>(Colors.black),
             ),
             onPressed: () {
-              final currentDate = appService.execute();
-              showSnackBar(currentDate);
             },
             child: const Text('Get Date'),
           ),
@@ -118,4 +100,13 @@ class DetailsPage extends StatelessWidget {
       ),
     );
   }
+}
+
+
+void showSnackBar(String currentDate, BuildContext context) {
+  SnackBar snackBar = SnackBar(
+    content: Text(currentDate),
+    duration: const Duration(milliseconds: 500),
+  );
+  ScaffoldMessenger.of(context).showSnackBar(snackBar);
 }
